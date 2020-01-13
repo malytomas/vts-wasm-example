@@ -1,0 +1,46 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Wasm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Checkout submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Install emscripten
+      run: |
+        cd ..
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install latest
+        ./emsdk activate latest
+
+    - name: Configure
+      run: |
+        source ../emsdk/emsdk_env.sh
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=release -DEMSCRIPTEN_PREFIX=$EMSDK/upstream/emscripten -DCMAKE_TOOLCHAIN_FILE=$PWD/../browser/externals/browser/browser/cmake/wasm.toolchain.cmake ..
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --target vts-browser-wasm-canvas -- -j3
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: build/bin/release
+        CLEAN: true
+
+
