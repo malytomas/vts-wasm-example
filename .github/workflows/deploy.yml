@@ -28,7 +28,7 @@ jobs:
         source ../emsdk/emsdk_env.sh
         mkdir build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=release -DEMSCRIPTEN_PREFIX=$EMSDK/upstream/emscripten -DCMAKE_TOOLCHAIN_FILE=$PWD/../browser/externals/browser/browser/cmake/wasm.toolchain.cmake ..
+        cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_TOOLCHAIN_FILE=$PWD/../browser/toolchains/wasm.cmake ..
 
     - name: Build
       run: |
